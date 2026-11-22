@@ -16,7 +16,7 @@ npm run build
 npm start
 ```
 
-Then open http://localhost:3000 (`npm start` uses port 3200 if you keep the script as is).
+Then open http://localhost:3200.
 
 ## How it works
 
