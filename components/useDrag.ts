@@ -15,7 +15,7 @@ export function useDrag(onMove: (dx: number, dy: number) => void, onStart?: () =
     // Leave the scrollbar of a scrolling body to the browser.
     if (t.scrollHeight > t.clientHeight && e.nativeEvent.offsetX > t.clientWidth) return;
     // On touch, let the window body scroll; drag from the title bar only.
-    if (e.pointerType === "touch" && !t.closest(".win-bar, .alert-title")) return;
+    if (e.pointerType === "touch" && !t.closest(".win-bar, .sp-top, .alert-title")) return;
     start.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     onStart?.();

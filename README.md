@@ -31,11 +31,12 @@ Every push to `main` builds a static export (`STATIC_EXPORT=1`, `NEXT_PUBLIC_BAS
 - `components/Window.tsx` — project, gallery, bin and PDF windows
 - `components/Dock.tsx`, `Alert.tsx`, `AppIcons.tsx` — dock, alerts, app icons
 - `lib/content.ts` — projects, copy, alerts, the CV PDF; `lib/layout.json` — icon positions per screen size
+- `components/Music.tsx`, `app/music.css`, `lib/music.ts` — the Spotify-style music app (songs go in `public/music/song-01.mp3` …, titles in `lib/music.ts`)
 - `public/` — background (`bg-hireme.webp`), CV images (`projects/`), dock icons (`apps/`), CV (`cv_miranda_final.pdf`)
 
 ## Behaviour
 
 - Hover an icon: grey box, larger picture, blue label (195 ms). Drag to move it; click to open its window.
 - Windows and alerts drag from anywhere; red dot closes a window (210 ms animation).
-- Dock: After Effects / Photoshop / Illustrator / Error open alerts; CV opens the PDF; Photos opens the gallery; Bin opens "Bin of ideas"; Instagram and Mail are links.
+- Dock: After Effects / Photoshop / Illustrator / Error open alerts; CV opens the PDF; Gallery opens the gallery; Spotify opens the music app; Bin opens "Bin of ideas"; Mail is a link.
 - Breakpoints: ≤ 1199 px tablet layout with a side dock; ≤ 809 px mobile layout.

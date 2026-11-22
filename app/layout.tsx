@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Figtree, Inter } from "next/font/google";
 import "./globals.css";
+import "./music.css";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "600", "700"], variable: "--font-inter" });
+// Music app font (close to the Spotify desktop app type).
+const music = Figtree({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "700", "900"], variable: "--font-music" });
 
 export const metadata: Metadata = {
   title: "novaarlen",
@@ -13,7 +16,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${music.variable}`}>
       <body>{children}</body>
     </html>
   );

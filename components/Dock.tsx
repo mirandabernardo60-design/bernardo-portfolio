@@ -16,7 +16,7 @@ const GROUPS: { id: AppId; name: string; href?: string }[][] = [
     { id: "photos", name: "Gallery" },
   ],
   [
-    { id: "social", name: "Instagram", href: OWNER.social },
+    { id: "spotify", name: "Spotify" },
     { id: "mail", name: "Mail", href: `mailto:${OWNER.email}` },
   ],
   [{ id: "bin", name: "Bin of ideas" }],

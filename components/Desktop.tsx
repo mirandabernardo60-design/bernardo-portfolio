@@ -6,6 +6,7 @@ import { asset } from "@/lib/asset";
 import { Dock } from "./Dock";
 import { Alert } from "./Alert";
 import { Window, type WinKind } from "./Window";
+import { Music } from "./Music";
 
 type Win = { key: string; kind: WinKind; z: number; x: number; y: number; w: number; h: number; closing?: boolean };
 const CLOSE_MS = 210;
@@ -22,6 +23,7 @@ const SPOTS: [number, number][] = [
 const FIXED_SPOT: Record<string, [number, number]> = {
   notes: [659 / 1440, 117 / 900],
   pdf: [659 / 1440, 20 / 900],
+  music: [0.5, 20 / 900],
   gallery: [463 / 1440, 138 / 900],
   bin: [548 / 1440, 141 / 900],
 };
@@ -35,6 +37,14 @@ function windowSize(vw: number, kind: WinKind) {
     // Fit the height to one A4 page at that width (title bar 31 + 10 px bottom margin).
     return { w, h: Math.min(maxH, Math.round((w - 20) * 1.414) + 41) };
   }
+  // Music app: large like the desktop app in the reference recording, above the dock.
+  if (kind === "music") {
+    const vh = window.innerHeight;
+    // Below 1200 px the dock is a side bar: the app covers the screen (above the dock, see music.css).
+    if (vw < 1200) return { w: vw - 20, h: vh - 20 };
+    // Desktop: stay above the bottom dock (dock top = vh - 116), 10 px gap.
+    return { w: Math.min(vw - 40, 1984), h: Math.min(vh - 146, 1180) };
+  }
   if (vw < 810) return { w: 293, h: 506 };
   return { w: 576, h: kind === "notes" ? 500 : 540 };
 }
@@ -46,6 +56,7 @@ export function Desktop() {
   const [selected, setSelected] = useState<string | null>(null);
   const [lifted, setLifted] = useState<string | null>(null);
   const [wins, setWins] = useState<Win[]>([]);
+  const [musicHidden, setMusicHidden] = useState(false);
   const [alerts, setAlerts] = useState<{ id: AlertKey; dx: number; dy: number }[]>([]);
   const zRef = useRef(10);
   const drag = useRef<{ id: string; sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
@@ -60,6 +71,8 @@ export function Desktop() {
       const { w, h } = windowSize(vw, kind);
       const idx = kind === "project" ? Number(key.slice(1)) : 0;
       const [fx, fy] = FIXED_SPOT[kind] ?? SPOTS[idx % SPOTS.length];
+      // The music window is centred horizontally.
+      if (kind === "music") return [...ws, { key, kind, z, x: Math.round((vw - w) / 2), y: Math.max(10, Math.round(Math.min(fy * vh, vh - h - 10))), w, h }];
       // PDF windows cascade (40 px each) so the three CVs don't open exactly on top of each other.
       const step = kind === "pdf" ? Math.max(0, Object.keys(PDFS).indexOf(key)) * 40 : 0;
       const x = Math.round(Math.min(Math.max(10, fx * vw - step), Math.max(10, vw - w - 10)));
@@ -96,6 +109,7 @@ export function Desktop() {
       } else if (id === "notes") open("cv", "pdf");
       else if (id === "pdf1") open("cv1", "pdf");
       else if (id === "pdf2") open("cv2", "pdf");
+      else if (id === "spotify") { setMusicHidden(false); open("music", "music"); }
       else if (id === "photos") open("gallery", "gallery");
       else if (id === "bin") open("bin", "bin");
     },
@@ -168,7 +182,9 @@ export function Desktop() {
         })}
       </div>
 
-      {wins.map((w) => (
+      {wins.map((w) => w.kind === "music" ? (
+        <Music key={w.key} id={w.key} x={w.x} y={w.y} z={w.z} w={w.w} h={w.h} closing={!!w.closing} hidden={musicHidden} onClose={close} onFocus={focus} onMove={moveWin} onMinimize={() => setMusicHidden(true)} />
+      ) : (
         <Window key={w.key} id={w.key} kind={w.kind} x={w.x} y={w.y} z={w.z} w={w.w} h={w.h} closing={!!w.closing} onClose={close} onFocus={focus} onMove={moveWin} />
       ))}
 

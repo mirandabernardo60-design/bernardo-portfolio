@@ -132,7 +132,7 @@ export const BIN = {
   items: [12, 13, 14, 15].map((k) => ({ src: `${cvImage(k)}.webp`, caption: `Unused colourway ${k - 11}` })),
 };
 
-export type AppId = "motion" | "pixel" | "vector" | "error" | "notes" | "pdf1" | "pdf2" | "photos" | "social" | "mail" | "bin";
+export type AppId = "motion" | "pixel" | "vector" | "error" | "notes" | "pdf1" | "pdf2" | "photos" | "spotify" | "social" | "mail" | "bin";
 
 // The user's PDFs, opened from the dock's PDF icons. Keys are the window keys.
 export const PDFS: Record<string, { file: string; name: string; app: AppId }> = {

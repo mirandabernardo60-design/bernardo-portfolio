@@ -4,7 +4,7 @@ import { BIN, CV_RATIO, GALLERY, NOTES, OWNER, PDFS, projects, type Block } from
 import { AppIcon } from "./AppIcons";
 import { useDrag } from "./useDrag";
 
-export type WinKind = "project" | "notes" | "gallery" | "bin" | "pdf";
+export type WinKind = "project" | "notes" | "gallery" | "bin" | "pdf" | "music";
 
 type Props = {
   id: string;
