@@ -1,4 +1,5 @@
 import layoutJson from "./layout.json";
+import { asset } from "./asset";
 
 export type Pos = [number, number];
 export type Block =
@@ -63,7 +64,7 @@ const TEXT = [
   "Placeholder copy: the original project description is not reproduced in this reconstruction.",
 ];
 
-const art = (i: number, k: number) => `/art/p${i}-${k}.svg`;
+const art = (i: number, k: number) => asset(`/art/p${i}-${k}.svg`);
 
 function previewFor(i: number): Block[] {
   const v = i % 4;
@@ -91,7 +92,7 @@ function previewFor(i: number): Block[] {
 }
 
 const CV_IMAGES = 18;
-const cvImage = (i: number) => `/projects/cv-${String((i % CV_IMAGES) + 1).padStart(2, "0")}`;
+const cvImage = (i: number) => asset(`/projects/cv-`) + `${String((i % CV_IMAGES) + 1).padStart(2, "0")}`;
 
 const CREDITS: [string, string][] = [
   ["Art Direction:", "Nova Arlen"],
@@ -162,7 +163,7 @@ export type AppId = "motion" | "pixel" | "vector" | "error" | "notes" | "pdf1" |
 
 // The user's PDFs, opened from the dock's PDF icons. Keys are the window keys.
 export const PDFS: Record<string, { file: string; name: string; app: AppId }> = {
-  cv: { file: "/cv_miranda_final.pdf", name: "cv_miranda_final.pdf", app: "notes" },
+  cv: { file: asset("/cv_miranda_final.pdf"), name: "cv_miranda_final.pdf", app: "notes" },
 };
 
 export const ALERTS: Record<"motion" | "pixel" | "vector" | "error", { app: string; text: string; button: string; at: Pos }> = {

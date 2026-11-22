@@ -1,5 +1,7 @@
 # Bernardo Miranda: desktop portfolio
 
+**Live:** https://mirandabernardo60-design.github.io/bernardo-portfolio/
+
 A one-screen "desktop" portfolio: draggable project icons over a full-screen background, a dock, Finder-style project windows, joke alert dialogs and the CV as a PDF.
 
 ![Desktop](docs/preview-desktop.png)
@@ -17,6 +19,10 @@ npm start
 ```
 
 Then open http://localhost:3200.
+
+## Deploy
+
+Every push to `main` builds a static export (`STATIC_EXPORT=1`, `NEXT_PUBLIC_BASE_PATH=/bernardo-portfolio`) and publishes it to GitHub Pages (`.github/workflows/pages.yml`).
 
 ## How it works
 

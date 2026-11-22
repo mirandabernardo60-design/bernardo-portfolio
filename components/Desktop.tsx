@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState, type CSSProperties } from "react";
 import { ALERTS, PDFS, projects, type AppId } from "@/lib/content";
+import { asset } from "@/lib/asset";
 import { Dock } from "./Dock";
 import { Alert } from "./Alert";
 import { Window, type WinKind } from "./Window";
@@ -127,7 +128,7 @@ export function Desktop() {
     <main className="desk">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {/* User-supplied "Hire me *Pls" background (2000×738). Earlier portrait: public/bg-photo.webp; drawn stand-in: bg.svg / bg.jpg. */}
-      <img className="desk-bg" src="/bg-hireme.webp" alt="" draggable={false} />
+      <img className="desk-bg" src={asset("/bg-hireme.webp")} alt="" draggable={false} />
       <div className="icons" onPointerMove={onPointerMove}>
         {projects.map((p) => {
           const [ox, oy] = offsets[p.id] ?? [0, 0];
