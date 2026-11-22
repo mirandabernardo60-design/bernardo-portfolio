@@ -31,7 +31,7 @@ Every push to `main` builds a static export (`STATIC_EXPORT=1`, `NEXT_PUBLIC_BAS
 - `components/Window.tsx` — project, gallery, bin and PDF windows
 - `components/Dock.tsx`, `Alert.tsx`, `AppIcons.tsx` — dock, alerts, app icons
 - `lib/content.ts` — projects, copy, alerts, the CV PDF; `lib/layout.json` — icon positions per screen size
-- `components/Music.tsx`, `app/music.css`, `lib/music.ts` — the Spotify-style music app (songs go in `public/music/song-01.mp3` …, titles in `lib/music.ts`)
+- `components/Music.tsx`, `app/music.css`, `lib/music.ts` — the Spotify-style music app (titles in `lib/music.ts`; the MP3s in `public/music/` are commercial songs kept on the local machine only and are gitignored, so the published site has no audio)
 - `public/` — background (`bg-hireme.webp`), CV images (`projects/`), dock icons (`apps/`), CV (`cv_miranda_final.pdf`)
 
 ## Behaviour

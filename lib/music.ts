@@ -1,33 +1,53 @@
 import { asset } from "./asset";
 
-// Music app (dock icon "Spotify"). The songs are placeholders until the MP3s arrive:
-// drop the files in public/music/ and set each track's title and file below.
-export const ARTIST = "Bernardo Miranda";
+// Music app (dock icon "Spotify"). The MP3s live in public/music/song-NN.mp3 on the user's
+// computer only: they are commercial releases, so they are gitignored and never published.
+export const ARTIST = "Bernardo Miranda"; // owner of the playlists
 
 const pad = (n: number) => String(n).padStart(2, "0");
 // Square covers cut from the user's 18 CV colourways (public/music/covers).
 export const cover = (n: number) => asset(`/music/covers/c-${pad(((n - 1) % 18) + 1)}.jpg`);
-// Main colour of each cover (dominant pixel colour; black covers use Spotify's grey).
+// Main colour of each cover (dominant pixel colour; black and white covers use Spotify's greys).
 const TINTS = ["#309030", "#535353", "#535353", "#1010f0", "#b0b0b0", "#1010f0", "#b3b3b3", "#b3b3b3", "#b3b3b3", "#b3b3b3", "#f0b0d0", "#d0f0f0", "#10f0f0", "#10f030", "#f0f010", "#f01070", "#b3b3b3", "#f0f010"];
 export const tint = (n: number) => TINTS[(n - 1) % 18];
 
-export type Track = { id: string; title: string; artist: string; src: string; cover: string; tint: string };
+export type Track = { id: string; title: string; artist: string; src: string; cover: string; tint: string; dur: number };
 
-export const TRACKS: Track[] = Array.from({ length: 8 }, (_, i) => ({
-  id: `t${i + 1}`,
-  title: `Song ${i + 1}`,
-  artist: ARTIST,
+// [title, artist, length in s (read from the files)]
+const SONGS: [string, string, number][] = [
+  ["Deslocado", "NAPA", 180],
+  ["Gilded Lily", "Cults", 213],
+  ["Always Forever", "Cults", 224],
+  ["Which Witch", "Florence + The Machine", 259],
+  ["A Gira", "unfazed", 152],
+  ["Oblivion", "Grimes", 251],
+  ["Disparate Youth", "Santigold", 284],
+  ["Spitting Off the Edge of the World", "Yeah Yeah Yeahs, Perfume Genius", 258],
+  ["Never Saw The Point", "Cults", 184],
+  ["Porto Côvo", "Rui Veloso", 243],
+  ["Lisboa (feat. Tim)", "Tara Perdida, Tim", 193],
+  ["Amanhã Tou Melhor", "Capitão Fausto", 207],
+  ["1 Casa 2 Portões", "Filipe Karlsson", 153],
+];
+
+export const TRACKS: Track[] = SONGS.map(([title, artist, dur], i) => ({
+  id: `t${i + 1}`, title, artist, dur,
   src: asset(`/music/song-${pad(i + 1)}.mp3`),
   cover: cover(i + 1),
   tint: tint(i + 1),
 }));
+const ids = (...n: number[]) => n.map((i) => TRACKS[i].id);
 const ALL = TRACKS.map((t) => t.id);
-const rot = (k: number) => [...ALL.slice(k), ...ALL.slice(0, k)];
+const firstArtists = (tr: string[]) => {
+  const names = [...new Set(tr.map((id) => TRACKS.find((t) => t.id === id)!.artist.split(", ")[0]))];
+  return names.length > 3 ? `${names.slice(0, 3).join(", ")} e mais` : names.join(", ");
+};
 
 export type Collection = {
   id: string;
   title: string;
   sub: string;
+  owner: string;
   kind: "liked" | "playlist" | "artist" | "mix" | "single";
   cover: string;
   tint: string;
@@ -35,61 +55,52 @@ export type Collection = {
   label?: { text: string; color: string };
 };
 
-const col = (id: string, title: string, sub: string, kind: Collection["kind"], n: number, tracks: string[], label?: Collection["label"]): Collection => ({
-  id, title, sub, kind, cover: cover(n), tint: kind === "liked" ? "#5038a0" : tint(n), tracks, label,
+const col = (id: string, title: string, sub: string, kind: Collection["kind"], n: number, tracks: string[], owner = ARTIST, label?: Collection["label"]): Collection => ({
+  id, title, sub, owner, kind, cover: cover(n), tint: kind === "liked" ? "#5038a0" : tint(n), tracks, label,
 });
+const playlist = (id: string, title: string, n: number, tracks: string[]) => col(id, title, `Playlist • ${ARTIST}`, "playlist", n, tracks);
 
-export const LIKED = col("liked", "Músicas de que gostaste", "Playlist • Bernardo Miranda", "liked", 1, ALL);
+export const LIKED = col("liked", "Músicas de que gostaste", `Playlist • ${ARTIST}`, "liked", 1, ALL);
+const CULTS = col("cults", "Cults", "Artista", "artist", 2, ids(1, 2, 8), "Cults");
 
 export const SHORTCUTS: Collection[] = [
   LIKED,
-  col("hire", "Hire me *Pls", "Playlist • Bernardo Miranda", "playlist", 15, rot(1)),
-  col("motion", "Motion Designer", "Playlist • Bernardo Miranda", "playlist", 13, rot(2)),
-  col("editor", "Video Editor", "Playlist • Bernardo Miranda", "playlist", 4, rot(3)),
-  col("artist", ARTIST, "Artista", "artist", 1, ALL),
-  col("designer", "Designer", "Playlist • Bernardo Miranda", "playlist", 16, rot(4)),
-  col("lisboa", "Lisboa à noite", "Playlist • Bernardo Miranda", "playlist", 2, rot(5)),
-  col("estudio", "Estúdio", "Playlist • Bernardo Miranda", "playlist", 11, rot(6)),
+  playlist("hire", "Hire me *Pls", 15, ids(6, 1, 10, 3, 0, 5, 12, 7, 2, 9, 4, 11, 8)),
+  playlist("motion", "Motion Designer", 13, ids(5, 6, 7, 3)),
+  playlist("editor", "Video Editor", 4, ids(2, 1, 8, 3)),
+  CULTS,
+  playlist("designer", "Designer", 16, ids(3, 5, 6, 7, 1)),
+  playlist("lisboa", "Lisboa à noite", 2, ids(10, 9, 11, 12, 0, 4)),
+  playlist("estudio", "Estúdio", 11, ids(0, 4, 11, 12, 2)),
 ];
 
 export const NEW_RELEASE = TRACKS[0];
 
+const mix = (id: string, text: string, n: number, tracks: string[], color: string) => col(id, text, firstArtists(tracks), "mix", n, tracks, "Spotify", { text, color });
 export const MIXES: Collection[] = [
-  col("mix-house", "Mix de House", "Bernardo Miranda, Song 2, Song 5 e mais", "mix", 18, rot(1), { text: "Mix de House", color: "#f0f046" }),
-  col("mix-calm", "Mix tranquila", "Song 3, Song 7, Bernardo Miranda e mais", "mix", 6, rot(2), { text: "Mix tranquila", color: "#7fb3f5" }),
-  col("mix-hiphop", "Mix de Hip-hop", "Song 4, Song 1, Song 8 e mais", "mix", 3, rot(3), { text: "Mix de Hip-hop", color: "#f2c6f2" }),
-  col("mix-pop", "Mix de Pop", "Bernardo Miranda, Song 6 e mais", "mix", 16, rot(4), { text: "Mix de Pop", color: "#f7b3a5" }),
-  col("mix-lofi", "Mix de Lo-fi", "Song 2, Song 8, Song 5 e mais", "mix", 12, rot(5), { text: "Mix de Lo-fi", color: "#cfc8f7" }),
-  col("mix-indie", "Mix de Indie", "Song 6, Song 3 e mais", "mix", 14, rot(6), { text: "Mix de Indie", color: "#a8e6b4" }),
+  mix("mix-indie", "Mix de Indie", 18, ids(1, 7, 3, 2, 8), "#f0f046"),
+  mix("mix-calm", "Mix tranquila", 6, ids(1, 8, 11, 12), "#7fb3f5"),
+  mix("mix-pt", "Mix de Rock Português", 3, ids(9, 10, 11, 0, 4), "#f2c6f2"),
+  mix("mix-pop", "Mix de Pop", 16, ids(5, 6, 3, 0), "#f7b3a5"),
+  mix("mix-alt", "Mix de Alternativa", 12, ids(7, 6, 5, 4), "#cfc8f7"),
+  mix("mix-dream", "Mix de Dream Pop", 14, ids(2, 5, 1, 8), "#a8e6b4"),
 ];
 
 export const RECENT: Collection[] = [
   { ...LIKED, title: "Músicas apreciadas", sub: "Playlist • Spotify" },
   SHORTCUTS[1],
-  { ...SHORTCUTS[4], sub: "Artista" },
+  CULTS,
+  SHORTCUTS[6],
   SHORTCUTS[2],
   SHORTCUTS[3],
   SHORTCUTS[5],
-  SHORTCUTS[6],
   SHORTCUTS[7],
 ];
 
-export const MORE_LIKE: Collection[] = TRACKS.map((t, i) => col(`more-${t.id}`, t.title, `Single • ${t.artist}`, "single", i + 9, rot(i)));
-
-// "Atividade de audição": made-up friends listening to the user's songs (no real people).
-export const FRIENDS = [
-  ["Inês", 0, "3 min", "Hire me *Pls"],
-  ["Tiago", 3, "3 min", "Motion Designer"],
-  ["Marta", 1, "56 min", "Lisboa à noite"],
-  ["rui.costa", 5, "1 h", "Mix tranquila"],
-  ["Joana", 2, "2 h", "Estúdio"],
-  ["Duarte", 6, "5 h", "Video Editor"],
-  ["Beatriz", 4, "8 h", "Designer"],
-  ["sofia.m", 7, "22 h", "Mix de Pop"],
-  ["Pedro", 1, "1 d", "Músicas apreciadas"],
-  ["Miguel", 3, "1 d", "Mix de House"],
-  ["Carolina", 5, "2 d", "Hire me *Pls"],
-].map(([name, t, ago, from], i) => ({ name: name as string, track: TRACKS[t as number], ago: ago as string, from: from as string, avatar: cover(i + 4) }));
+// "Mais como Cults": the other songs, one card each.
+export const MORE_LIKE_OF = "Cults";
+export const MORE_LIKE: Collection[] = TRACKS.map((t, i) => col(`single-${t.id}`, t.title, `Single • ${t.artist}`, "single", i + 1, [t.id], t.artist));
+export const NEW_SINGLE = MORE_LIKE[0];
 
 // Left rail of the library (covers only, like the reference).
 export const LIBRARY: Collection[] = [LIKED, ...SHORTCUTS.slice(1), ...MIXES.slice(0, 4), ...MORE_LIKE.slice(0, 4)];

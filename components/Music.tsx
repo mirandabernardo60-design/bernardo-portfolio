@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FRIENDS, LIBRARY, LIKED, MIXES, MORE_LIKE, NEW_RELEASE, RECENT, SHORTCUTS, TRACKS, ARTIST, findTrack, type Collection, type Track } from "@/lib/music";
+import { LIBRARY, LIKED, MIXES, MORE_LIKE, MORE_LIKE_OF, NEW_RELEASE, NEW_SINGLE, RECENT, SHORTCUTS, TRACKS, ARTIST, findTrack, type Collection, type Track } from "@/lib/music";
 import { useDrag } from "./useDrag";
 
 // Spotify-style music app, laid out from the user's screen recording (desktop app, PT-PT UI).
@@ -184,7 +184,7 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
           <div>
             <p className="sp-hero-k">{c.kind === "artist" ? "Artista" : c.kind === "single" ? "Single" : "Playlist"}</p>
             <h2>{c.title}</h2>
-            <p className="sp-hero-s"><b>{ARTIST}</b> • {tracks.length} músicas</p>
+            <p className="sp-hero-s"><b>{c.owner}</b> • {tracks.length} {tracks.length === 1 ? "música" : "músicas"}</p>
           </div>
         </header>
         <div className="sp-actions">{playBtn(c)}<button type="button" className="sp-icon" aria-label="Aleatório" onClick={() => setShuffle((s) => !s)} data-on={shuffle}>{I.shuffle}</button><button type="button" className="sp-icon" aria-label="Mais opções">{I.dots}</button></div>
@@ -201,7 +201,7 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
                   <span><b>{t.title}</b><small>{t.artist}</small></span>
                 </span>
                 <span className="al">{c.title}</span>
-                <span className="du">{cur && dur ? fmt(dur) : "–:––"}</span>
+                <span className="du">{fmt(t.dur)}</span>
               </li>
             );
           })}
@@ -227,7 +227,7 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
                   <button type="button" className="ov" aria-label={`Reproduzir ${t.title}`} onClick={() => playTrack(t)}>{cur && playing ? I.pause : I.play}</button>
                   <span><b>{t.title}</b><small>{t.artist}</small></span>
                 </span>
-                <span className="du">{cur && dur ? fmt(dur) : "–:––"}</span>
+                <span className="du">{fmt(t.dur)}</span>
               </li>
             );
           })}
@@ -257,16 +257,16 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
             <div className="sp-sec-h">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="sp-sec-av" src={NEW_RELEASE.cover} alt="" />
-              <div><p className="sp-pre">Novo lançamento de</p><h3>{ARTIST}</h3></div>
+              <div><p className="sp-pre">Novo lançamento de</p><h3>{NEW_RELEASE.artist}</h3></div>
             </div>
             <div className="sp-new-body">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="sp-new-art" src={NEW_RELEASE.cover} alt="" onClick={() => go({ kind: "collection", id: MORE_LIKE[0].id })} />
+              <img className="sp-new-art" src={NEW_RELEASE.cover} alt="" onClick={() => go({ kind: "collection", id: NEW_SINGLE.id })} />
               <div>
-                <p className="sp-new-k">Single • {ARTIST}</p>
+                <p className="sp-new-k">Single • {NEW_RELEASE.artist}</p>
                 <p className="sp-new-t">{NEW_RELEASE.title}</p>
                 <div className="sp-new-a">
-                  <button type="button" className="sp-wplay" aria-label={`Reproduzir ${NEW_RELEASE.title}`} onClick={() => playCollection(MORE_LIKE[0])}>{isOn(MORE_LIKE[0]) ? I.pause : I.play}</button>
+                  <button type="button" className="sp-wplay" aria-label={`Reproduzir ${NEW_RELEASE.title}`} onClick={() => playCollection(NEW_SINGLE)}>{isOn(NEW_SINGLE) ? I.pause : I.play}</button>
                   <button type="button" className="sp-icon" aria-label="Guardar na biblioteca">{I.addCircle}</button>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
         </div>
 
         {section("Recentes", RECENT.map((c) => card(c, c.id + "r", c.kind === "artist")))}
-        {section(ARTIST, MORE_LIKE.map((c) => card(c, c.id)), "Mais como", TRACKS[0].cover)}
+        {section(MORE_LIKE_OF, MORE_LIKE.filter((c) => !c.owner.includes(MORE_LIKE_OF)).map((c) => card(c, c.id)), "Mais como", TRACKS[1].cover)}
       </div>
     );
   }
@@ -315,7 +315,7 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
         </div>
         <div className="sp-top-r">
           <button type="button" className="sp-icon" aria-label="Novidades">{I.bell}</button>
-          <button type="button" className="sp-icon" aria-label="Atividade de audição" data-on={friends} onClick={() => setFriends((f) => !f)}>{I.friends}</button>
+          <button type="button" className="sp-icon" aria-label="Vista A tocar" data-on={friends} onClick={() => setFriends((f) => !f)}>{I.friends}</button>
           <span className="sp-avatar">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={TRACKS[0].cover} alt={ARTIST} />
@@ -339,24 +339,48 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
 
         <main className="sp-main" key={hist.i}>{main}</main>
 
-        {friends && (
-          <aside className="sp-friends">
-            <div className="sp-friends-h"><h3>Atividade de audição</h3><button type="button" className="sp-icon" aria-label="Fechar" onClick={() => setFriends(false)}>{I.x}</button></div>
-            <ul>
-              {FRIENDS.map((f) => (
-                <li key={f.name} onClick={() => playTrack(f.track)}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={f.avatar} alt="" />
-                  <div>
-                    <p className="fn"><b>{f.name}</b><span>{f.ago}</span></p>
-                    <p className="ft">{f.track.title} • {f.track.artist}</p>
-                    <p className="fp">{I.note}{f.from}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        )}
+        {friends && (() => {
+          // "A tocar" panel (Now playing view), laid out from the user's screenshot. Spotify shows a
+          // lyrics preview in the blue card; lyrics are copyrighted, so it shows the queue instead.
+          const ctxTitle = ctx ? findCol(ctx).title : LIKED.title;
+          const nextUp = [1, 2, 3].map((k) => queue[(idx + k) % queue.length]).filter((v, i, a) => v !== track.id && a.indexOf(v) === i).map(findTrack);
+          const main0 = track.artist.split(", ")[0];
+          const related = [...TRACKS.filter((t) => t.id !== track.id && t.artist.includes(main0)), ...TRACKS.filter((t) => t.id !== track.id && !t.artist.includes(main0))].slice(0, 2);
+          const count = TRACKS.filter((t) => t.artist.includes(main0)).length;
+          return (
+            <aside className="sp-np" aria-label="A tocar">
+              <div className="sp-np-h"><h3>{ctxTitle}</h3><button type="button" className="sp-icon" aria-label="Fechar" onClick={() => setFriends(false)}>{I.x}</button></div>
+              <div className="sp-np-body">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="sp-np-art" src={track.cover} alt="" />
+                <div className="sp-np-t">
+                  <div><p className="t">{track.title}</p><p className="a">{track.artist}</p></div>
+                  <span className="sp-saved">{I.check}</span>
+                </div>
+                <div className="sp-np-card sp-np-queue" style={{ "--tint": track.tint } as React.CSSProperties}>
+                  <p className="h">A seguir na fila</p>
+                  {nextUp.map((t) => <button key={t.id} type="button" onClick={() => setIdx(queue.indexOf(t.id))}>{t.title}</button>)}
+                </div>
+                <p className="sp-np-sh">Mais de {main0}{related.some((t) => !t.artist.includes(main0)) ? " e semelhantes" : ""}</p>
+                <div className="sp-np-rel">
+                  {related.map((t) => (
+                    <button key={t.id} type="button" onClick={() => playTrack(t)}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={t.cover} alt="" />
+                      <b>{t.title}</b>
+                      <small>{t.artist}</small>
+                    </button>
+                  ))}
+                </div>
+                <div className="sp-np-card sp-np-artist" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.15), rgba(0,0,0,.65)), url(${related[0]?.cover ?? track.cover})` }}>
+                  <p className="h">Perfil de artista</p>
+                  <p className="n">{main0}</p>
+                  <p className="c">{count} {count === 1 ? "música" : "músicas"} nesta biblioteca</p>
+                </div>
+              </div>
+            </aside>
+          );
+        })()}
       </div>
 
       <footer className="sp-bar">

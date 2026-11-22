@@ -5,3 +5,6 @@ next-env.d.ts
 *.tsbuildinfo
 .env*
 out
+
+# Commercial songs: local only, never published (copyright)
+public/music/*.mp3
