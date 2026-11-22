@@ -11,6 +11,10 @@ export const cover = (n: number) => asset(`/music/covers/c-${pad(((n - 1) % 18) 
 const TINTS = ["#309030", "#535353", "#535353", "#1010f0", "#b0b0b0", "#1010f0", "#b3b3b3", "#b3b3b3", "#b3b3b3", "#b3b3b3", "#f0b0d0", "#d0f0f0", "#10f0f0", "#10f030", "#f0f010", "#f01070", "#b3b3b3", "#f0f010"];
 export const tint = (n: number) => TINTS[(n - 1) % 18];
 
+// Each song's own cover, taken from its MP3 (local only; the published build uses the CV covers).
+const LOCAL_ART = process.env.NEXT_PUBLIC_LOCAL_ART === "1";
+const ART_TINTS = ["#505050", "#90d0d0", "#5090b0", "#505050", "#b0d050", "#509070", "#907050", "#5090b0", "#505050", "#9090b0", "#905070", "#f09050", "#907050"];
+
 export type Track = { id: string; title: string; artist: string; src: string; cover: string; tint: string; dur: number };
 
 // [title, artist, length in s (read from the files)]
@@ -33,8 +37,8 @@ const SONGS: [string, string, number][] = [
 export const TRACKS: Track[] = SONGS.map(([title, artist, dur], i) => ({
   id: `t${i + 1}`, title, artist, dur,
   src: asset(`/music/song-${pad(i + 1)}.mp3`),
-  cover: cover(i + 1),
-  tint: tint(i + 1),
+  cover: LOCAL_ART ? asset(`/music/art/song-${pad(i + 1)}.jpg`) : cover(i + 1),
+  tint: LOCAL_ART ? ART_TINTS[i] : tint(i + 1),
 }));
 const ids = (...n: number[]) => n.map((i) => TRACKS[i].id);
 const ALL = TRACKS.map((t) => t.id);
@@ -61,7 +65,7 @@ const col = (id: string, title: string, sub: string, kind: Collection["kind"], n
 const playlist = (id: string, title: string, n: number, tracks: string[]) => col(id, title, `Playlist • ${ARTIST}`, "playlist", n, tracks);
 
 export const LIKED = col("liked", "Músicas de que gostaste", `Playlist • ${ARTIST}`, "liked", 1, ALL);
-const CULTS = col("cults", "Cults", "Artista", "artist", 2, ids(1, 2, 8), "Cults");
+const CULTS = { ...col("cults", "Cults", "Artista", "artist", 2, ids(1, 2, 8), "Cults"), ...(LOCAL_ART ? { cover: TRACKS[1].cover, tint: TRACKS[1].tint } : {}) };
 
 export const SHORTCUTS: Collection[] = [
   LIKED,
@@ -99,7 +103,7 @@ export const RECENT: Collection[] = [
 
 // "Mais como Cults": the other songs, one card each.
 export const MORE_LIKE_OF = "Cults";
-export const MORE_LIKE: Collection[] = TRACKS.map((t, i) => col(`single-${t.id}`, t.title, `Single • ${t.artist}`, "single", i + 1, [t.id], t.artist));
+export const MORE_LIKE: Collection[] = TRACKS.map((t, i) => ({ ...col(`single-${t.id}`, t.title, `Single • ${t.artist}`, "single", i + 1, [t.id], t.artist), cover: t.cover, tint: t.tint }));
 export const NEW_SINGLE = MORE_LIKE[0];
 
 // Left rail of the library (covers only, like the reference).

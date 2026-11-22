@@ -8,3 +8,4 @@ out
 
 # Commercial songs: local only, never published (copyright)
 public/music/*.mp3
+public/music/art/

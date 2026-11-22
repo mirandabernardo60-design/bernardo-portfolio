@@ -318,7 +318,7 @@ export function Music({ id, x, y, z, w, h, closing, hidden, onClose, onFocus, on
           <button type="button" className="sp-icon" aria-label="Vista A tocar" data-on={friends} onClick={() => setFriends((f) => !f)}>{I.friends}</button>
           <span className="sp-avatar">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={TRACKS[0].cover} alt={ARTIST} />
+            <img src={LIKED.cover} alt={ARTIST} />
           </span>
           <button type="button" className="sp-wc" aria-label="Minimizar" onClick={onMinimize}>{I.min}</button>
           <button type="button" className="sp-wc" aria-label={max ? "Restaurar" : "Maximizar"} onClick={() => setMax((m) => !m)}>{I.max}</button>
