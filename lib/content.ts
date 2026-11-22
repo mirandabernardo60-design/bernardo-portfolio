@@ -64,34 +64,8 @@ const TEXT = [
   "Placeholder copy: the original project description is not reproduced in this reconstruction.",
 ];
 
-const art = (i: number, k: number) => asset(`/art/p${i}-${k}.svg`);
-
-function previewFor(i: number): Block[] {
-  const v = i % 4;
-  if (v === 0) return [
-    { kind: "full", src: art(i, 0), ratio: 1 },
-    { kind: "video", src: art(i, 3), caption: "Music video, placeholder poster" },
-    { kind: "two", srcs: [art(i, 1), art(i, 2)] },
-    { kind: "three", srcs: [art(i, 3), art(i, 4), art(i, 5)] },
-  ];
-  if (v === 1) return [
-    { kind: "two", srcs: [art(i, 0), art(i, 1)] },
-    { kind: "full", src: art(i, 2), ratio: 0.66 },
-    { kind: "two", srcs: [art(i, 3), art(i, 4)] },
-  ];
-  if (v === 2) return [
-    { kind: "full", src: art(i, 1), ratio: 0.66 },
-    { kind: "three", srcs: [art(i, 2), art(i, 3), art(i, 4)] },
-    { kind: "full", src: art(i, 5), ratio: 1 },
-  ];
-  return [
-    { kind: "full", src: art(i, 0), ratio: 1 },
-    { kind: "full", src: art(i, 2), ratio: 1.25 },
-    { kind: "two", srcs: [art(i, 4), art(i, 5)] },
-  ];
-}
-
 const CV_IMAGES = 18;
+export const CV_RATIO = 2000 / 1416;
 const cvImage = (i: number) => asset(`/projects/cv-`) + `${String((i % CV_IMAGES) + 1).padStart(2, "0")}`;
 
 const CREDITS: [string, string][] = [
@@ -115,7 +89,8 @@ export const projects: Project[] = PROJECTS.map(([title, client, type], i) => ({
   h: 85,
   pos: { desktop: layout[i].desktop, tablet: layout[i].tablet, mobile: layout[i].mobile },
   text: TEXT.slice(0, 2 + (i % 3)),
-  preview: [{ kind: "full", src: `${cvImage(i)}.webp`, ratio: 2000 / 1416 } as Block, ...previewFor(i)],
+  // Only the user's CV pictures: no placeholder art.
+  preview: [{ kind: "full", src: `${cvImage(i)}.webp`, ratio: CV_RATIO }],
   credits: CREDITS.slice(0, 3 + (i % 4)),
 }));
 
@@ -146,17 +121,15 @@ export const NOTES = {
   ] as [string, string][],
 };
 
-const GALLERY_IDX = PROJECTS.length;
-const BIN_IDX = PROJECTS.length + 1;
 export const GALLERY = {
   title: "Gallery",
   subtitle: "Lowkey documentation",
-  images: [0, 1, 2, 3, 4, 5].map((k) => art(GALLERY_IDX, k)),
+  images: Array.from({ length: CV_IMAGES }, (_, k) => `${cvImage(k)}.webp`),
 };
 export const BIN = {
   title: "Bin of ideas",
   subtitle: "Unused yet cool selection",
-  items: [0, 1, 2, 3].map((k) => ({ src: art(BIN_IDX, k), caption: `Unused concept ${k + 1}, placeholder` })),
+  items: [12, 13, 14, 15].map((k) => ({ src: `${cvImage(k)}.webp`, caption: `Unused colourway ${k - 11}` })),
 };
 
 export type AppId = "motion" | "pixel" | "vector" | "error" | "notes" | "pdf1" | "pdf2" | "photos" | "social" | "mail" | "bin";

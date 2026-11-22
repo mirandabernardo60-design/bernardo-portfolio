@@ -1,6 +1,6 @@
 "use client";
 
-import { BIN, GALLERY, NOTES, OWNER, PDFS, projects, type Block } from "@/lib/content";
+import { BIN, CV_RATIO, GALLERY, NOTES, OWNER, PDFS, projects, type Block } from "@/lib/content";
 import { AppIcon } from "./AppIcons";
 import { useDrag } from "./useDrag";
 
@@ -113,7 +113,7 @@ export function Window({ id, kind, x, y, z, w, h, closing, onClose, onFocus, onM
       <>
         <Head thumb={<AppIcon id="photos" />} title={GALLERY.title} sub={GALLERY.subtitle} />
         <Caret>Preview:</Caret>
-        <div className="preview">{GALLERY.images.map((s, i) => <Img key={s} src={s} ratio={i % 2 ? 0.66 : 1} />)}</div>
+        <div className="preview">{GALLERY.images.map((s) => <Img key={s} src={s} ratio={CV_RATIO} />)}</div>
       </>
     );
   } else if (kind === "bin") {
@@ -125,7 +125,7 @@ export function Window({ id, kind, x, y, z, w, h, closing, onClose, onFocus, onM
         <div className="preview">
           {BIN.items.map((it) => (
             <figure key={it.src} className="bin-item">
-              <Img src={it.src} ratio={0.6} />
+              <Img src={it.src} ratio={CV_RATIO} />
               <figcaption>{it.caption}</figcaption>
             </figure>
           ))}
