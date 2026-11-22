@@ -1,28 +1,35 @@
-# Nova Arlen desktop (reconstruction)
+# Bernardo Miranda: desktop portfolio
 
-One-screen "desktop" portfolio: draggable project icons over a blurred figure, a dock, Finder-style info windows and joke alert dialogs.
+A one-screen "desktop" portfolio: draggable project icons over a full-screen background, a dock, Finder-style project windows, joke alert dialogs and the CV as a PDF.
 
-## Run
+![Desktop](docs/preview-desktop.png)
+
+![Project window and alert](docs/preview-window.png)
+
+<img src="docs/preview-mobile.png" alt="Mobile" width="300">
+
+## Run it
+
 ```
 npm install
 npm run build
-npm start        # http://localhost:3200 (or serve it with the Nexus `serve` command)
+npm start
 ```
 
-## Structure
-- `app/` — layout (Inter via `next/font`), page, `globals.css` (all measured sizes, colours and animations)
-- `components/Desktop.tsx` — state: icon drag offsets, selection, open windows (z-order, close animation), alerts
-- `components/Window.tsx` — project / notes / gallery / bin windows
-- `components/Dock.tsx`, `Alert.tsx`, `AppIcons.tsx` — dock, alerts, app icons (`public/apps/*.png`, user-supplied macOS icons)
-- `lib/content.ts` — placeholder projects, copy, alerts; `lib/layout.json` — icon positions (% centre) per breakpoint
-- `scripts/generate-art.mjs` — generates every image in `public/art/` and `public/bg.svg` (rendered to `public/bg.jpg`)
+Then open http://localhost:3000 (`npm start` uses port 3200 if you keep the script as is).
+
+## How it works
+
+- `app/` — layout (Inter via `next/font`), page, `globals.css` (sizes, colours, animations)
+- `components/Desktop.tsx` — icons, drag, open windows, alerts
+- `components/Window.tsx` — project, gallery, bin and PDF windows
+- `components/Dock.tsx`, `Alert.tsx`, `AppIcons.tsx` — dock, alerts, app icons
+- `lib/content.ts` — projects, copy, alerts, the CV PDF; `lib/layout.json` — icon positions per screen size
+- `public/` — background (`bg-hireme.webp`), CV images (`projects/`), dock icons (`apps/`), CV (`cv_miranda_final.pdf`)
 
 ## Behaviour
-- Hover/selected: grey box, 60 → 70 px art, blue label pill (195 ms).
-- Drag an icon to move it (3 px threshold); click without moving to open its window.
-- Windows open with a measured spring (366 ms) and close with a 210 ms scale-down + fade.
-- Windows and alerts can be dragged from anywhere (grab / grabbing cursor, no limits); on touch, from the title bar.
-- Dock tooltips: pill + arrow, 195 ms crossfade.
-- The CV dock item (PDF icon) opens `public/cv_miranda_final.pdf` in an A4-sized window (set in `lib/content.ts` → `PDFS`). (Browsers that can't show PDFs inline, like most phones, show a blank or download prompt in that window.)
-- Breakpoints: ≤ 1199 px tablet layout and vertical dock; ≤ 809 px mobile layout and 293×506 windows.
-- Respects `prefers-reduced-motion`.
+
+- Hover an icon: grey box, larger picture, blue label (195 ms). Drag to move it; click to open its window.
+- Windows and alerts drag from anywhere; red dot closes a window (210 ms animation).
+- Dock: After Effects / Photoshop / Illustrator / Error open alerts; CV opens the PDF; Photos opens the gallery; Bin opens "Bin of ideas"; Instagram and Mail are links.
+- Breakpoints: ≤ 1199 px tablet layout with a side dock; ≤ 809 px mobile layout.
